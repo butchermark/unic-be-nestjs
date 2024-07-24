@@ -2,18 +2,18 @@ import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { MongooseModule } from '@nestjs/mongoose';
-import { User, UserSchema } from './schemas/User.schema';
-import { Book, BookSchema } from './schemas/Book.schema';
-import { Review, ReviewSchema } from './schemas/Review.schema';
+import { AuthModule } from './auth/auth.module';
+import { UsersModule } from './users/users.module';
+import { BooksModule } from './books/books.module';
+import { ReviewsModule } from './reviews/reviews.module';
 
 @Module({
   imports: [
     MongooseModule.forRoot('mongodb://127.0.0.1/unic-be-nestjs'),
-    MongooseModule.forFeature([
-      { name: User.name, schema: UserSchema },
-      { name: Book.name, schema: BookSchema },
-      { name: Review.name, schema: ReviewSchema },
-    ]),
+    AuthModule,
+    UsersModule,
+    BooksModule,
+    ReviewsModule,
   ],
   controllers: [AppController],
   providers: [AppService],
