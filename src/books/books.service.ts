@@ -4,6 +4,8 @@ import { Model } from 'mongoose';
 import { Book } from 'src/schemas/Book.schema';
 import { CreateBookDto } from './dto/create-book.dto';
 import { UpdateBookDto } from './dto/update-book.dto';
+import { MongoIdDto } from 'src/users/dto/mongo-id.dto';
+import { BookNotFoundException } from 'src/exceptions/book-not-found.exception';
 
 @Injectable()
 export class BooksService {
@@ -18,20 +20,35 @@ export class BooksService {
     return this.bookModel.find().exec();
   }
 
-  async getBook(id: string): Promise<Book | null> {
-    return this.bookModel.findById(id).exec();
+  async getBook(id: MongoIdDto): Promise<Book | null> {
+    const book = this.bookModel.findById(id).exec();
+    if (!book) {
+      throw new BookNotFoundException(id);
+    }
+    return book;
   }
 
   async updateBook(
-    id: string,
+    id: MongoIdDto,
     updateBookDto: UpdateBookDto,
   ): Promise<Book | null> {
-    return this.bookModel
+    const book = this.bookModel
       .findByIdAndUpdate(id, updateBookDto, { new: true })
       .exec();
+
+    if (!book) {
+      throw new BookNotFoundException(id);
+    }
+
+    return book;
   }
 
-  async deleteBook(id: string): Promise<Book | null> {
-    return this.bookModel.findByIdAndDelete(id).exec();
+  async deleteBook(id: MongoIdDto): Promise<Book | null> {
+    const book = this.bookModel.findByIdAndDelete(id).exec();
+    if (!book) {
+      throw new BookNotFoundException(id);
+    }
+
+    return book;
   }
 }

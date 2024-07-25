@@ -12,6 +12,7 @@ import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { ApiBody, ApiParam, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { User } from 'src/schemas/User.schema';
+import { MongoIdDto } from './dto/mongo-id.dto';
 
 @ApiTags('users')
 @Controller('users')
@@ -54,7 +55,11 @@ export class UsersController {
     return this.usersService.getMe();
   }
 
-  @ApiParam({ name: 'id', description: 'The ID of the user to retrieve' })
+  @ApiParam({
+    type: MongoIdDto,
+    name: 'id',
+    description: 'The ID of the user to retrieve',
+  })
   @ApiResponse({
     status: 200,
     description: 'The user has been successfully retrieved.',
@@ -63,7 +68,7 @@ export class UsersController {
   @ApiResponse({ status: 403, description: 'Forbidden.' })
   @HttpCode(HttpStatus.OK)
   @Get(':id')
-  async getUser(@Param('id') id: string): Promise<User | null> {
+  async getUser(@Param('id') id: MongoIdDto): Promise<User | string> {
     return this.usersService.getUser(id);
   }
 
@@ -76,7 +81,7 @@ export class UsersController {
   @ApiResponse({ status: 403, description: 'Forbidden.' })
   @HttpCode(HttpStatus.NO_CONTENT)
   @Delete(':id')
-  async deleteUser(@Param('id') id: string): Promise<void> {
+  async deleteUser(@Param('id') id: MongoIdDto): Promise<User> {
     return this.usersService.deleteUser(id);
   }
 }

@@ -6,8 +6,8 @@ import {
   HttpCode,
   HttpStatus,
   Param,
+  Patch,
   Post,
-  Put,
   UseGuards,
 } from '@nestjs/common';
 import { ReviewsService } from './reviews.service';
@@ -15,6 +15,7 @@ import { CreateReviewDto } from './dto/create-review.dto';
 import { UpdateReviewDto } from './dto/update-review.dto';
 import { ApiBody, ApiParam, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { Review } from 'src/schemas/review.schema';
+import { MongoIdDto } from 'src/users/dto/mongo-id.dto';
 
 @ApiTags('reviews')
 @Controller('books/:bookId/reviews')
@@ -34,7 +35,7 @@ export class ReviewsController {
   @HttpCode(HttpStatus.CREATED)
   @Post()
   async createReview(
-    @Param('bookId') bookId: string,
+    @Param('bookId') bookId: MongoIdDto,
     @Body() createReviewDto: CreateReviewDto,
   ): Promise<Review> {
     return this.reviewsService.createReview(bookId, createReviewDto);
@@ -49,7 +50,9 @@ export class ReviewsController {
   @ApiResponse({ status: 403, description: 'Forbidden.' })
   @HttpCode(HttpStatus.OK)
   @Get()
-  async getReviewsByBook(@Param('bookId') bookId: string): Promise<Review[]> {
+  async getReviewsByBook(
+    @Param('bookId') bookId: MongoIdDto,
+  ): Promise<Review[]> {
     return this.reviewsService.getReviewsByBook(bookId);
   }
 
@@ -63,7 +66,7 @@ export class ReviewsController {
   @ApiResponse({ status: 403, description: 'Forbidden.' })
   @HttpCode(HttpStatus.OK)
   @Get('reviews/:id')
-  async getReview(@Param('id') id: string): Promise<Review | null> {
+  async getReview(@Param('id') id: MongoIdDto): Promise<Review | null> {
     return this.reviewsService.getReview(id);
   }
 
@@ -80,9 +83,9 @@ export class ReviewsController {
     description: 'Forbidden. Authentication required.',
   })
   @HttpCode(HttpStatus.OK)
-  @Put('reviews/:id')
+  @Patch('reviews/:id')
   async updateReview(
-    @Param('id') id: string,
+    @Param('id') id: MongoIdDto,
     @Body() updateReviewDto: UpdateReviewDto,
   ): Promise<Review | null> {
     return this.reviewsService.updateReview(id, updateReviewDto);
@@ -100,7 +103,7 @@ export class ReviewsController {
   })
   @HttpCode(HttpStatus.NO_CONTENT)
   @Delete('reviews/:id')
-  async deleteReview(@Param('id') id: string): Promise<void> {
+  async deleteReview(@Param('id') id: MongoIdDto): Promise<void> {
     return this.reviewsService.deleteReview(id);
   }
 }

@@ -6,6 +6,7 @@ import {
   HttpCode,
   HttpStatus,
   Param,
+  Patch,
   Post,
   Put,
 } from '@nestjs/common';
@@ -14,6 +15,7 @@ import { CreateBookDto } from './dto/create-book.dto';
 import { UpdateBookDto } from './dto/update-book.dto';
 import { ApiBody, ApiParam, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { Book } from 'src/schemas/Book.schema';
+import { MongoIdDto } from 'src/users/dto/mongo-id.dto';
 
 @ApiTags('books')
 @Controller('books')
@@ -52,7 +54,7 @@ export class BooksController {
   @ApiResponse({ status: 403, description: 'Forbidden.' })
   @HttpCode(HttpStatus.OK)
   @Get(':id')
-  async getBook(@Param('id') id: string): Promise<Book | null> {
+  async getBook(@Param('id') id: MongoIdDto): Promise<Book | null> {
     return this.booksService.getBook(id);
   }
 
@@ -65,9 +67,9 @@ export class BooksController {
   @ApiResponse({ status: 404, description: 'The book was not found.' })
   @ApiResponse({ status: 403, description: 'Forbidden.' })
   @HttpCode(HttpStatus.OK)
-  @Put(':id')
+  @Patch(':id')
   async updateBook(
-    @Param('id') id: string,
+    @Param('id') id: MongoIdDto,
     @Body() updateBookDto: UpdateBookDto,
   ): Promise<Book | null> {
     return this.booksService.updateBook(id, updateBookDto);
@@ -82,7 +84,7 @@ export class BooksController {
   @ApiResponse({ status: 403, description: 'Forbidden.' })
   @HttpCode(HttpStatus.NO_CONTENT)
   @Delete(':id')
-  async deleteBook(@Param('id') id: string): Promise<Book | null> {
+  async deleteBook(@Param('id') id: MongoIdDto): Promise<Book | null> {
     return this.booksService.deleteBook(id);
   }
 }

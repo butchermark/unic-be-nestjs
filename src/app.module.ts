@@ -6,9 +6,11 @@ import { AuthModule } from './auth/auth.module';
 import { UsersModule } from './users/users.module';
 import { BooksModule } from './books/books.module';
 import { ReviewsModule } from './reviews/reviews.module';
+import { ConfigModule } from '@nestjs/config';
 
 @Module({
   imports: [
+    ConfigModule.forRoot({ envFilePath: '.env.example' }),
     MongooseModule.forRoot('mongodb://127.0.0.1/unic-be-nestjs'),
     AuthModule,
     UsersModule,
