@@ -38,9 +38,14 @@ export class ReviewsController {
     @Param('bookId') bookId: MongoIdDto,
     @Body() createReviewDto: CreateReviewDto,
   ): Promise<Review> {
-    return this.reviewsService.createReview(bookId, createReviewDto);
+    return await this.reviewsService.createReview(bookId, createReviewDto);
   }
 
+  @ApiParam({
+    name: 'bookId',
+    description: 'The ID of the book',
+    type: String,
+  })
   @ApiResponse({
     status: 200,
     description:
@@ -53,7 +58,7 @@ export class ReviewsController {
   async getReviewsByBook(
     @Param('bookId') bookId: MongoIdDto,
   ): Promise<Review[]> {
-    return this.reviewsService.getReviewsByBook(bookId);
+    return await this.reviewsService.getReviewsByBook(bookId);
   }
 
   @ApiParam({ name: 'id', description: 'The ID of the review to retrieve' })
@@ -67,7 +72,7 @@ export class ReviewsController {
   @HttpCode(HttpStatus.OK)
   @Get('reviews/:id')
   async getReview(@Param('id') id: MongoIdDto): Promise<Review | null> {
-    return this.reviewsService.getReview(id);
+    return await this.reviewsService.getReview(id);
   }
 
   @ApiParam({ name: 'id', description: 'The ID of the review to update' })
@@ -88,7 +93,7 @@ export class ReviewsController {
     @Param('id') id: MongoIdDto,
     @Body() updateReviewDto: UpdateReviewDto,
   ): Promise<Review | null> {
-    return this.reviewsService.updateReview(id, updateReviewDto);
+    return await this.reviewsService.updateReview(id, updateReviewDto);
   }
 
   @ApiParam({ name: 'id', description: 'The ID of the review to delete' })
@@ -104,6 +109,6 @@ export class ReviewsController {
   @HttpCode(HttpStatus.NO_CONTENT)
   @Delete('reviews/:id')
   async deleteReview(@Param('id') id: MongoIdDto): Promise<void> {
-    return this.reviewsService.deleteReview(id);
+    return await this.reviewsService.deleteReview(id);
   }
 }

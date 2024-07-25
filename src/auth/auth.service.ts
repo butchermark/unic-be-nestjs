@@ -13,6 +13,25 @@ export class AuthService {
     @InjectModel(User.name) private userModel: Model<User>,
   ) {}
 
+  async register(dto: AuthDto): Promise<any> {
+    const user = await this.userModel.findOne({ email: dto.email }).exec();
+    if (user) {
+      throw new UnauthorizedException('User does already exist', dto.email);
+    } else {
+      const hashedPassword = await crypto
+        .createHmac('sha256', process.env.USER_SALT)
+        .update(dto.password)
+        .digest('base64');
+
+      const newUser = new this.userModel({
+        email: dto.email,
+        password: hashedPassword,
+      });
+
+      await newUser.save();
+    }
+  }
+
   async signin(dto: AuthDto): Promise<any> {
     const user = await this.userModel.findOne({ email: dto.email }).exec();
     if (!user) {

@@ -17,7 +17,7 @@ export class CreateReviewDto {
   })
   @IsString()
   @IsNotEmpty()
-  readonly content: string;
+  text: string;
 
   @ApiProperty({
     description: 'The rating given in the review, between 1 and 5',
@@ -29,7 +29,7 @@ export class CreateReviewDto {
   @IsInt()
   @Min(1)
   @Max(5)
-  readonly rating: number;
+  rating: number;
 
   @ApiProperty({
     description:
@@ -40,5 +40,5 @@ export class CreateReviewDto {
   })
   @IsString()
   @IsOptional()
-  readonly userId?: string;
+  userId?: string;
 }

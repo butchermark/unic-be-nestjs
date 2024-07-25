@@ -15,12 +15,15 @@ export class ReviewsService {
     bookId: MongoIdDto,
     createReviewDto: CreateReviewDto,
   ): Promise<Review> {
-    const newReview = new this.reviewModel({ ...createReviewDto, bookId });
+    const newReview = new this.reviewModel({
+      ...createReviewDto,
+      bookId,
+    });
     return newReview.save();
   }
 
   async getReviewsByBook(bookId: MongoIdDto): Promise<Review[]> {
-    const reviews = this.reviewModel.find({ bookId }).exec();
+    const reviews = await this.reviewModel.find({ bookId }).exec();
     if (!reviews) {
       throw new ReviewNotFoundException(bookId);
     }
