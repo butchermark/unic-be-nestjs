@@ -13,15 +13,23 @@ import {
 import { ReviewsService } from './reviews.service';
 import { CreateReviewDto } from './dto/create-review.dto';
 import { UpdateReviewDto } from './dto/update-review.dto';
-import { ApiBody, ApiParam, ApiResponse, ApiTags } from '@nestjs/swagger';
+import {
+  ApiBearerAuth,
+  ApiBody,
+  ApiParam,
+  ApiResponse,
+  ApiTags,
+} from '@nestjs/swagger';
 import { Review } from 'src/schemas/review.schema';
 import { MongoIdDto } from 'src/users/dto/mongo-id.dto';
+import { JwtAuthGuard } from 'src/auth/guards/auth.guard';
 
 @ApiTags('reviews')
 @Controller('books/:bookId/reviews')
 export class ReviewsController {
   constructor(private readonly reviewsService: ReviewsService) {}
 
+  @ApiBearerAuth()
   @ApiBody({ type: CreateReviewDto })
   @ApiResponse({
     status: 201,
@@ -33,6 +41,7 @@ export class ReviewsController {
     description: 'Forbidden. Authentication required.',
   })
   @HttpCode(HttpStatus.CREATED)
+  @UseGuards(JwtAuthGuard)
   @Post()
   async createReview(
     @Param('bookId') bookId: MongoIdDto,
@@ -57,7 +66,7 @@ export class ReviewsController {
   @Get()
   async getReviewsByBook(
     @Param('bookId') bookId: MongoIdDto,
-  ): Promise<Review[]> {
+  ): Promise<{ averageRating: number; reviews: Review[] }> {
     return await this.reviewsService.getReviewsByBook(bookId);
   }
 
@@ -88,6 +97,7 @@ export class ReviewsController {
     description: 'Forbidden. Authentication required.',
   })
   @HttpCode(HttpStatus.OK)
+  @UseGuards(JwtAuthGuard)
   @Patch('reviews/:id')
   async updateReview(
     @Param('id') id: MongoIdDto,

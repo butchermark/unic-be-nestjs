@@ -10,6 +10,8 @@ async function bootstrap() {
     .setTitle('Book Review API Documentation')
     .setDescription('Felvételi feladat - Jun / Med szoftverfejlesztő')
     .setVersion('1.0')
+    .addBearerAuth()
+    .addSecurityRequirements('bearer')
     .addTag('--')
     .build();
   const document = SwaggerModule.createDocument(app, config);

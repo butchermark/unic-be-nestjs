@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
+import { Request } from 'express';
 import { User } from 'src/schemas/User.schema';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UserNotFoundException } from 'src/exceptions/user-not-found.exception';
@@ -19,9 +20,15 @@ export class UsersService {
     return this.userModel.find();
   }
 
-  async getMe() {
-    //
-    return this.userModel.findOne({});
+  async getMe(req: Request) {
+    const user = req.user as User;
+    const foundUser: User = await this.userModel.findById(user._id);
+
+    if (!foundUser) {
+      throw new UserNotFoundException(user._id);
+    }
+
+    return foundUser;
   }
 
   async deleteUser(id: MongoIdDto) {

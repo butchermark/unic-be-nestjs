@@ -15,6 +15,7 @@ export class ReviewsService {
     bookId: MongoIdDto,
     createReviewDto: CreateReviewDto,
   ): Promise<Review> {
+    console.log(createReviewDto);
     const newReview = new this.reviewModel({
       ...createReviewDto,
       bookId,
@@ -22,12 +23,18 @@ export class ReviewsService {
     return newReview.save();
   }
 
-  async getReviewsByBook(bookId: MongoIdDto): Promise<Review[]> {
-    const reviews = await this.reviewModel.find({ bookId }).exec();
+  async getReviewsByBook(
+    bookId: MongoIdDto,
+  ): Promise<{ averageRating: number; reviews: Review[] }> {
+    const reviews: Review[] = await this.reviewModel.find({ bookId }).exec();
     if (!reviews) {
       throw new ReviewNotFoundException(bookId);
     }
-    return reviews;
+
+    const totalRating = reviews.reduce((sum, review) => sum + review.rating, 0);
+    const averageRating = totalRating / reviews.length;
+
+    return { averageRating, reviews };
   }
 
   async getReview(id: MongoIdDto): Promise<Review | null> {

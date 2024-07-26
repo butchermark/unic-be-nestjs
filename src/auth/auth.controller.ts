@@ -25,21 +25,34 @@ import { User } from 'src/schemas/User.schema';
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
-  @HttpCode(HttpStatus.OK)
   @Post('registration')
+  @HttpCode(HttpStatus.OK)
   @UsePipes(new ValidationPipe({ whitelist: true, forbidNonWhitelisted: true }))
+  @ApiBody({ type: AuthDto, description: 'User registration data.' })
+  @ApiResponse({
+    status: 200,
+    description: 'User successfully registered.',
+    type: User,
+  })
+  @ApiResponse({ status: 400, description: 'Bad Request.' })
   async registration(@Body() user: AuthDto): Promise<User> {
-    console.log(user.email);
     return await this.authService.register(user);
   }
 
-  @ApiBody({ type: AuthDto })
+  @Post('signin')
+  @HttpCode(HttpStatus.OK)
+  @ApiBody({ type: AuthDto, description: 'User sign-in data.' })
   @ApiResponse({
     status: 200,
     description: 'User successfully signed in. Returns a JWT token.',
+    schema: {
+      example: {
+        accessToken: 'string',
+        refreshToken: 'string',
+      },
+    },
   })
   @ApiResponse({ status: 401, description: 'Unauthorized.' })
-  @HttpCode(HttpStatus.OK)
   @Post('signin')
   async signin(@Body() dto: AuthDto, @Res() res: Response): Promise<Object> {
     const jwt = await this.authService.signin(dto);
@@ -47,6 +60,8 @@ export class AuthController {
     return res.json(jwt);
   }
 
+  @Get('validate')
+  @HttpCode(HttpStatus.OK)
   @ApiResponse({
     status: 200,
     description: 'Validates the JWT token.',
@@ -58,13 +73,13 @@ export class AuthController {
     },
   })
   @ApiResponse({ status: 401, description: 'Unauthorized.' })
-  @HttpCode(HttpStatus.OK)
-  @Get('validate')
   async validate(@Req() req: Request): Promise<Object> {
     const user = await this.authService.validateUser(req.headers.authorization);
     return { message: 'token is valid', user: user };
   }
 
+  @Post('refresh-token')
+  @HttpCode(HttpStatus.OK)
   @ApiBody({ type: String, description: 'Refresh token string.' })
   @ApiResponse({
     status: 200,
@@ -76,16 +91,17 @@ export class AuthController {
     },
   })
   @ApiResponse({ status: 401, description: 'Unauthorized.' })
-  @HttpCode(HttpStatus.OK)
-  @Post('refresh-token')
   async validateRefreshToken(@Body() refreshTokenDto: string): Promise<any> {
     return this.authService.validateRefreshToken(refreshTokenDto);
   }
 
+  @Get('user-refresh-token')
+  @HttpCode(HttpStatus.OK)
   @UseGuards(JwtAuthGuard)
   @ApiQuery({
     name: 'userId',
     description: 'The ID of the user to retrieve refresh token for.',
+    type: String,
   })
   @ApiResponse({
     status: 200,
@@ -97,8 +113,6 @@ export class AuthController {
     },
   })
   @ApiResponse({ status: 401, description: 'Unauthorized.' })
-  @HttpCode(HttpStatus.OK)
-  @Get('user-refresh-token')
   async getUserRefreshToken(
     @Query('userId') userId: string,
   ): Promise<RefreshTokenDto> {

@@ -7,12 +7,22 @@ import {
   HttpStatus,
   Param,
   Post,
+  Req,
+  UseGuards,
 } from '@nestjs/common';
+import { Request } from 'express';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
-import { ApiBody, ApiParam, ApiResponse, ApiTags } from '@nestjs/swagger';
+import {
+  ApiBearerAuth,
+  ApiBody,
+  ApiParam,
+  ApiResponse,
+  ApiTags,
+} from '@nestjs/swagger';
 import { User } from 'src/schemas/User.schema';
 import { MongoIdDto } from './dto/mongo-id.dto';
+import { JwtAuthGuard } from 'src/auth/guards/auth.guard';
 
 @ApiTags('users')
 @Controller('users')
@@ -42,7 +52,6 @@ export class UsersController {
     return this.usersService.getAllUsers();
   }
 
-  @ApiParam({ name: 'id', description: 'The ID of the user to retrieve' })
   @ApiResponse({
     status: 200,
     description: 'The user has been successfully retrieved.',
@@ -50,9 +59,10 @@ export class UsersController {
   @ApiResponse({ status: 404, description: 'The user was not found.' })
   @ApiResponse({ status: 403, description: 'Forbidden.' })
   @HttpCode(HttpStatus.OK)
+  @UseGuards(JwtAuthGuard)
   @Get('me')
-  async getMe(): Promise<User> {
-    return this.usersService.getMe();
+  async getMe(@Req() req: Request): Promise<User> {
+    return this.usersService.getMe(req);
   }
 
   @ApiParam({
