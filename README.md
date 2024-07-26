@@ -1,5 +1,18 @@
+cd "C:\Program Files\MongoDB\Server\<version>\bin"
+
+run mongod.exe to start database
+
+seed the database:
+cd unic-be-nestjs\src
+
+node seed.ts
+
+backend:
+
 npm install
 npm run start
+
+Task:
 
 Felvételi feladat - Jun / Med szoftverfejlesztő
 Feladat leírása
